@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConnectionPool, NVarChar } from 'mssql';
 import { hash } from 'bcrypt';
 
@@ -7,48 +7,53 @@ import { ConfigurationService } from '../configuration/configuration.service';
 
 @Injectable()
 export class UserService {
+    pool: ConnectionPool = new ConnectionPool(this.configService.dbConfig);
 
     constructor(private configService: ConfigurationService) { }
 
-    async checkExistingUsername(username: string): Promise<boolean> {
+    async checkUsernameExists(username: string): Promise<boolean> {
         try {
-            const pool: ConnectionPool = new ConnectionPool(this.configService.dbConfig);
-            await pool.connect();
+            let usernameExists = false;
+            await this.pool.connect();
 
-            await pool.request()
+            await this.pool.request()
                 .input('Username', NVarChar, username)
-                .execute('Users.CheckExistingUsername', (err, recordsets) => {
-                    if (!err) {
-                        return recordsets.rowsAffected[0] === 1 ? true : false;
-                    }
+                .execute('Users.CheckUsernameExists')
+                .then((response) => {
+                    usernameExists = response.rowsAffected[0] === 1 ? true : false;
+                }, (error) => {
+                    Logger.log(error);
                 });
 
-            await pool.close();
+            await this.pool.close();
+
+            return usernameExists;
         } catch (err) {
-            // tslint:disable-next-line: no-console
-            console.log(err);
+            Logger.log(err);
         }
 
         return false;
     }
 
-    async checkExistingEmail(email: string): Promise<boolean> {
+    async checkEmailExists(email: string): Promise<boolean> {
         try {
-            const pool: ConnectionPool = new ConnectionPool(this.configService.dbConfig);
-            await pool.connect();
+            let emailExists = false;
+            await this.pool.connect();
 
-            await pool.request()
+            await this.pool.request()
                 .input('Email', NVarChar, email)
-                .execute('Users.CheckExistingEmail', (err, recordsets) => {
-                    if (!err) {
-                        return recordsets.rowsAffected[0] === 1 ? true : false;
-                    }
+                .execute('Users.CheckEmailExists')
+                .then((response) => {
+                    emailExists = response.rowsAffected[0] === 1 ? true : false;
+                }, (error) => {
+                    Logger.log(error);
                 });
 
-            await pool.close();
+            await this.pool.close();
+
+            return emailExists;
         } catch (err) {
-            // tslint:disable-next-line: no-console
-            console.log(err);
+            Logger.log(err);
         }
 
         return false;
@@ -56,19 +61,15 @@ export class UserService {
 
     async registerUser(newUser: NewUser) {
         let hashedPassword: string;
-        hash(newUser.password, 10, (err, encrypted) => {
-            if (!err) {
+        await hash(newUser.password, 10)
+            .then((encrypted) => {
                 hashedPassword = encrypted;
-            } else {
-                hashedPassword = 'error';
-            }
-        });
+            });
 
         try {
-            const pool: ConnectionPool = new ConnectionPool(this.configService.dbConfig);
-            await pool.connect();
+            await this.pool.connect();
 
-            await pool.request()
+            await this.pool.request()
                 .input('FirstName', NVarChar, newUser.firstName)
                 .input('LastName', NVarChar, newUser.lastName)
                 .input('Username', NVarChar, newUser.username)
@@ -76,10 +77,9 @@ export class UserService {
                 .input('PasswordHash', NVarChar, hashedPassword)
                 .execute('Users.CreateUser');
 
-            await pool.close();
+            await this.pool.close();
         } catch (err) {
-            // tslint:disable-next-line: no-console
-            console.log(err);
+            Logger.log(err);
         }
     }
 }
