@@ -6,6 +6,6 @@ export const dbConfig = {
     port: 1433,
     // Since we're on Windows Azure, we need to set the following options
     options: {
-          encrypt: true,
-      },
-   };
+        encrypt: true,
+    },
+};

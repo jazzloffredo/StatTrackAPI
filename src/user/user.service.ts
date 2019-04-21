@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConnectionPool, NVarChar } from 'mssql';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 
 import { NewUser } from './interfaces/new-user.interface';
+import { LoginUser } from './interfaces/login-user.interface';
 import { ConfigurationService } from '../configuration/configuration.service';
 
 @Injectable()
@@ -81,5 +82,38 @@ export class UserService {
         } catch (err) {
             Logger.log(err);
         }
+    }
+
+    async attemptLogin(loginUser: LoginUser): Promise<boolean> {
+        try {
+            let passwordMatchesHash = false;
+            await this.pool.connect();
+
+            let retrievedPasswordHash: string;
+            await this.pool.request()
+                .input('Username', NVarChar, loginUser.username)
+                .output('PasswordHash', NVarChar)
+                .execute('Users.RetrievePasswordHash')
+                .then((response) => {
+                    retrievedPasswordHash = response.output.PasswordHash;
+                }, (error) => {
+                    Logger.log(error);
+                });
+
+            await compare(loginUser.password, retrievedPasswordHash)
+                    .then((match) => {
+                        passwordMatchesHash = match;
+                    }, (err) => {
+                        Logger.log(err);
+                    });
+
+            await this.pool.close();
+
+            return passwordMatchesHash;
+        } catch (err) {
+            Logger.log(err);
+        }
+
+        return false;
     }
 }

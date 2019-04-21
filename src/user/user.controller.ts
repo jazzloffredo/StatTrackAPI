@@ -1,9 +1,11 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, Logger } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { CreateUserDTO } from './dto/create-user.dto';
+import { LoginUserDTO } from './dto/login-user.dto';
 import { UserService } from './user.service';
 import { UsernameExistsException } from '../exceptions/username-exists.exception';
 import { EmailExistsException } from '../exceptions/email-exists.exception';
+import { LoginFailedException } from '../exceptions/login-failed.exception';
 
 @Controller('user')
 export class UserController {
@@ -26,6 +28,23 @@ export class UserController {
         }
 
         await this.userService.registerUser(createUserDTO);
+        return;
+    }
+
+    @Post('attemptLogin')
+    @UsePipes(new ValidationPipe())
+    async attemptLogin(@Body() loginUserDTO: LoginUserDTO) {
+        const validUsername = await this.userService.checkUsernameExists(loginUserDTO.username);
+
+        if (!validUsername) {
+            throw new LoginFailedException();
+        }
+
+        const loginSuccess = await this.userService.attemptLogin(loginUserDTO);
+
+        if (!loginSuccess) {
+            throw new LoginFailedException();
+        }
         return;
     }
 }
