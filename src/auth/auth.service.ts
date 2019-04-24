@@ -7,17 +7,20 @@ import { LoginUser } from './interfaces/login-user.interface';
 import { ConfigurationService } from '../configuration/configuration.service';
 
 @Injectable()
-export class UserService {
-    pool: ConnectionPool = new ConnectionPool(this.configService.dbConfig);
+export class AuthService {
 
     constructor(private configService: ConfigurationService) { }
 
     async checkUsernameExists(username: string): Promise<boolean> {
-        try {
-            let usernameExists = false;
-            await this.pool.connect();
 
-            await this.pool.request()
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        let usernameExists = false;
+
+        try {
+            await pool.connect();
+
+            await pool.request()
                 .input('Username', NVarChar, username)
                 .execute('Users.CheckUsernameExists')
                 .then((response) => {
@@ -25,23 +28,27 @@ export class UserService {
                 }, (error) => {
                     Logger.log(error);
                 });
-
-            await this.pool.close();
-
-            return usernameExists;
         } catch (err) {
             Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
         }
 
-        return false;
+        return usernameExists;
     }
 
     async checkEmailExists(email: string): Promise<boolean> {
-        try {
-            let emailExists = false;
-            await this.pool.connect();
 
-            await this.pool.request()
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        let emailExists = false;
+
+        try {
+            await pool.connect();
+
+            await pool.request()
                 .input('Email', NVarChar, email)
                 .execute('Users.CheckEmailExists')
                 .then((response) => {
@@ -49,28 +56,27 @@ export class UserService {
                 }, (error) => {
                     Logger.log(error);
                 });
-
-            await this.pool.close();
-
-            return emailExists;
         } catch (err) {
             Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
         }
 
-        return false;
+        return emailExists;
     }
 
     async registerUser(newUser: NewUser) {
-        let hashedPassword: string;
-        await hash(newUser.password, 10)
-            .then((encrypted) => {
-                hashedPassword = encrypted;
-            });
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        const hashedPassword = await hash(newUser.password, 10);
 
         try {
-            await this.pool.connect();
+            await pool.connect();
 
-            await this.pool.request()
+            await pool.request()
                 .input('FirstName', NVarChar, newUser.firstName)
                 .input('LastName', NVarChar, newUser.lastName)
                 .input('Username', NVarChar, newUser.username)
@@ -78,19 +84,26 @@ export class UserService {
                 .input('PasswordHash', NVarChar, hashedPassword)
                 .execute('Users.CreateUser');
 
-            await this.pool.close();
         } catch (err) {
             Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
         }
     }
 
     async attemptLogin(loginUser: LoginUser): Promise<boolean> {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        let passwordMatchesHash = false;
+
         try {
-            let passwordMatchesHash = false;
-            await this.pool.connect();
+            await pool.connect();
 
             let retrievedPasswordHash: string;
-            await this.pool.request()
+            await pool.request()
                 .input('Username', NVarChar, loginUser.username)
                 .output('PasswordHash', NVarChar)
                 .execute('Users.RetrievePasswordHash')
@@ -100,20 +113,15 @@ export class UserService {
                     Logger.log(error);
                 });
 
-            await compare(loginUser.password, retrievedPasswordHash)
-                    .then((match) => {
-                        passwordMatchesHash = match;
-                    }, (err) => {
-                        Logger.log(err);
-                    });
-
-            await this.pool.close();
-
-            return passwordMatchesHash;
+            passwordMatchesHash = await compare(loginUser.password, retrievedPasswordHash);
         } catch (err) {
             Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
         }
 
-        return false;
+        return passwordMatchesHash;
     }
 }
