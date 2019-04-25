@@ -47,4 +47,33 @@ export class TeamService {
 
         return teams;
     }
+
+    async retrieveFavorteTimesForUser(username: string): Promise<string[]> {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        const teamIDs: string[] = [];
+
+        try {
+            await pool.connect();
+
+            const result = await pool.request()
+                .input('Username', username)
+                .execute('Users.RetrieveTeamFav');
+
+            const resultAsTable = result.recordset.toTable();
+
+            for (const curRow of resultAsTable.rows) {
+                teamIDs.push(curRow[0]);
+            }
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+
+        return teamIDs;
+    }
 }
