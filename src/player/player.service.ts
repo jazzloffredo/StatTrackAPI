@@ -22,14 +22,21 @@ export class PlayerService {
 
             const resultAsTable = result.recordset.toTable();
 
-            Logger.log(resultAsTable.rows[0]);
-            /*
             for (const curRow of resultAsTable.rows) {
                 const curPlayer: Player = {
+                    playerID: curRow[0],
+                    firstName: curRow[1],
+                    lastName: curRow[2],
+                    height: curRow[9],
+                    totalGames: curRow[3],
+                    totalGamesRank: curRow[8],
+                    totalRuns: curRow[4],
+                    totalRBIs: curRow[6],
+                    totalHomeruns: curRow[5],
+                    totalHomerunsRank: curRow[7],
                 };
                 players.push(curPlayer);
             }
-            */
 
         } catch (err) {
             Logger.log(err);
