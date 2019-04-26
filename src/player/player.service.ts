@@ -22,14 +22,14 @@ export class PlayerService {
 
             const resultAsTable = result.recordset.toTable();
 
+            Logger.log(resultAsTable.rows[0]);
+            /*
             for (const curRow of resultAsTable.rows) {
-                /*
                 const curPlayer: Player = {
                 };
                 players.push(curPlayer);
-                */
-               Logger.log(curRow);
             }
+            */
 
         } catch (err) {
             Logger.log(err);
