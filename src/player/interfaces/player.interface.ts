@@ -5,6 +5,7 @@ export interface Player {
     height: string;
     totalGames: number;
     totalGamesRank: number;
+    totalHits: number;
     totalRuns: number;
     totalRBIs: number;
     totalHomeruns: number;

@@ -9,7 +9,7 @@ import { UserFavoritePlayer } from './interfaces/user-favorite-player.interface'
 export class PlayerService {
     constructor(private configService: ConfigurationService) { }
 
-    async retrieveAllPlayers(): Promise<Player[]> {
+    async retrieveAllPlayersForPageNumber(pageNumber: number): Promise<Player[]> {
 
         const pool = new ConnectionPool(this.configService.dbConfig);
 
@@ -18,7 +18,9 @@ export class PlayerService {
         try {
             await pool.connect();
 
-            const result = await pool.request().execute('Stats.ListPlayers');
+            const result = await pool.request()
+                .input('Page', pageNumber)
+                .execute('Stats.ListPlayers');
 
             const resultAsTable = result.recordset.toTable();
 
@@ -27,13 +29,14 @@ export class PlayerService {
                     playerID: curRow[0],
                     firstName: curRow[1],
                     lastName: curRow[2],
-                    height: curRow[9],
+                    height: curRow[10],
                     totalGames: curRow[3],
-                    totalGamesRank: curRow[8],
-                    totalRuns: curRow[4],
-                    totalRBIs: curRow[6],
-                    totalHomeruns: curRow[5],
-                    totalHomerunsRank: curRow[7],
+                    totalGamesRank: curRow[9],
+                    totalHits: curRow[4],
+                    totalRuns: curRow[5],
+                    totalRBIs: curRow[7],
+                    totalHomeruns: curRow[6],
+                    totalHomerunsRank: curRow[8],
                 };
                 players.push(curPlayer);
             }

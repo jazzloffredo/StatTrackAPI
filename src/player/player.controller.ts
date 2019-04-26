@@ -9,9 +9,9 @@ export class PlayerController {
 
     constructor(private readonly playerService: PlayerService) {}
 
-    @Get('retrieveAllPlayers')
-    async retrieveAllTeams(): Promise<Player[]> {
-        return await this.playerService.retrieveAllPlayers();
+    @Get('retrieveAllPlayers/:pageNumber')
+    async retrieveAllTeams(@Param() params): Promise<Player[]> {
+        return await this.playerService.retrieveAllPlayersForPageNumber(params.pageNumber);
     }
 
     @Get('retrieveFavoritePlayers/:username')
