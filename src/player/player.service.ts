@@ -9,7 +9,7 @@ import { UserFavoritePlayer } from './interfaces/user-favorite-player.interface'
 export class PlayerService {
     constructor(private configService: ConfigurationService) { }
 
-    async retrieveAllPlayersForPageNumber(pageNumber: number): Promise<Player[]> {
+    async retrieveAllPlayersGivenChar(lastNameChar: string): Promise<Player[]> {
 
         const pool = new ConnectionPool(this.configService.dbConfig);
 
@@ -19,8 +19,8 @@ export class PlayerService {
             await pool.connect();
 
             const result = await pool.request()
-                .input('Page', pageNumber)
-                .execute('Stats.ListPlayers');
+                .input('LastNameChar', lastNameChar)
+                .execute('Stats.ListPlayersGivenChar');
 
             const resultAsTable = result.recordset.toTable();
 
@@ -29,9 +29,8 @@ export class PlayerService {
                     playerID: curRow[0],
                     firstName: curRow[1],
                     lastName: curRow[2],
-                    height: curRow[10],
+                    height: curRow[9],
                     totalGames: curRow[3],
-                    totalGamesRank: curRow[9],
                     totalHits: curRow[4],
                     totalRuns: curRow[5],
                     totalRBIs: curRow[7],
@@ -92,7 +91,7 @@ export class PlayerService {
 
             const result = await pool.request()
                 .input('Username', userFavPlayer.username)
-                .input('TeamId', userFavPlayer.playerID)
+                .input('PlayerId', userFavPlayer.playerID)
                 .execute('Users.CreatePlayerFav');
 
             favoriteAdded = result.rowsAffected[0] === 1 ? true : false;
@@ -118,7 +117,7 @@ export class PlayerService {
 
             const result = await pool.request()
                 .input('Username', userFavPlayer.username)
-                .input('TeamId', userFavPlayer.playerID)
+                .input('PlayerId', userFavPlayer.playerID)
                 .execute('Users.DelPlayerFav');
 
             favoriteDeleted = result.rowsAffected[0] === 1 ? true : false;
