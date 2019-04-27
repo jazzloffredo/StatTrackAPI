@@ -6,11 +6,13 @@ import { AuthService } from './auth/auth.service';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { TeamController } from './team/team.controller';
 import { TeamService } from './team/team.service';
+import { PlayerService } from './player/player.service';
+import { PlayerController } from './player/player.controller';
 
 
 @Module({
   imports: [ConfigurationModule],
-  controllers: [AppController, AuthController, TeamController],
-  providers: [AppService, AuthService, TeamService],
+  controllers: [AppController, AuthController, TeamController, PlayerController],
+  providers: [AppService, AuthService, TeamService, PlayerService],
 })
 export class AppModule {}
