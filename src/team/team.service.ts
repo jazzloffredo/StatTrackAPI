@@ -3,6 +3,7 @@ import { ConnectionPool } from 'mssql';
 
 import { ConfigurationService } from '../configuration/configuration.service';
 import { Team } from './interfaces/team.interface';
+import { TeamSeason } from './interfaces/team-season.interface';
 import { UserFavoriteTeam } from './interfaces/user-favorite-team.interface';
 
 @Injectable()
@@ -47,6 +48,52 @@ export class TeamService {
         }
 
         return teams;
+    }
+
+    async retrieveAllTeamSeasons(id: string): Promise<TeamSeason[]> {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        const teamSeasons: TeamSeason[] = [];
+
+        try {
+            await pool.connect();
+
+            const result = await pool.request()
+                .input('TeamId', id)
+                .execute('Stats.ListTeamSeasons');
+
+            const resultAsTable = result.recordset.toTable();
+
+            for (const curRow of resultAsTable.rows) {
+                const curTeamSeason: TeamSeason = {
+                    year: curRow[0],
+                    league: curRow[1],
+                    wins: curRow[2],
+                    losses: curRow[3],
+                    winLossRatio: curRow[4],
+                    yearRank: curRow[5],
+                    wsWinner: curRow[6],
+                    runsScored: curRow[7],
+                    runsAgainst: curRow[8],
+                    hittingStats: curRow[9],
+                    fieldingPercentage: curRow[10],
+                    hitsAllowed: curRow[11],
+                    errors: curRow[12],
+                    homeAttendance: curRow[13],
+                };
+                teamSeasons.push(curTeamSeason);
+            }
+
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+
+        return teamSeasons;
     }
 
     async retrieveFavorteTimesForUser(username: string): Promise<string[]> {
