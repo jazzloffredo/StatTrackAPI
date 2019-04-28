@@ -72,15 +72,13 @@ export class TeamService {
                     wins: curRow[2],
                     losses: curRow[3],
                     winLossRatio: curRow[4],
-                    yearRank: curRow[5],
-                    wsWinner: curRow[6],
-                    runsScored: curRow[7],
-                    runsAgainst: curRow[8],
-                    hittingStats: curRow[9],
-                    fieldingPercentage: curRow[10],
-                    hitsAllowed: curRow[11],
-                    errors: curRow[12],
-                    homeAttendance: curRow[13],
+                    wsWinner: curRow[5],
+                    runsScored: curRow[6],
+                    runsAgainst: curRow[7],
+                    hittingStats: curRow[8],
+                    hitsAllowed: curRow[9],
+                    errors: curRow[10],
+                    homeAttendance: curRow[11],
                 };
                 teamSeasons.push(curTeamSeason);
             }
@@ -92,7 +90,6 @@ export class TeamService {
                 pool.close();
             }
         }
-
         return teamSeasons;
     }
 
