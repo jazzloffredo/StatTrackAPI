@@ -1,4 +1,5 @@
 export interface TeamSeason {
+    teamName: string;
     year: number;
     league: string;
     wins: number;

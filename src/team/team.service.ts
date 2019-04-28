@@ -67,18 +67,19 @@ export class TeamService {
 
             for (const curRow of resultAsTable.rows) {
                 const curTeamSeason: TeamSeason = {
-                    year: curRow[0],
-                    league: curRow[1],
-                    wins: curRow[2],
-                    losses: curRow[3],
-                    winLossRatio: curRow[4],
-                    wsWinner: curRow[5],
-                    runsScored: curRow[6],
-                    runsAgainst: curRow[7],
-                    hittingStats: curRow[8],
-                    hitsAllowed: curRow[9],
-                    errors: curRow[10],
-                    homeAttendance: curRow[11],
+                    teamName: curRow[0],
+                    year: curRow[1],
+                    league: curRow[2],
+                    wins: curRow[3],
+                    losses: curRow[4],
+                    winLossRatio: curRow[5],
+                    wsWinner: curRow[6],
+                    runsScored: curRow[7],
+                    runsAgainst: curRow[8],
+                    hittingStats: curRow[9],
+                    hitsAllowed: curRow[10],
+                    errors: curRow[11],
+                    homeAttendance: curRow[12],
                 };
                 teamSeasons.push(curTeamSeason);
             }
