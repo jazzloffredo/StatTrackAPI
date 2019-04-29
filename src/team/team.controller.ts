@@ -22,7 +22,12 @@ export class TeamController {
 
     @Get('retrieveFavoriteTeams/:username')
     async retrieveFavorteTeamsForUser(@Param() params): Promise<string[]> {
-        return await this.teamService.retrieveFavorteTimesForUser(params.username);
+        return await this.teamService.retrieveFavoriteTeamsForUser(params.username);
+    }
+
+    @Get('retrieveFavoriteTeamNames/:username')
+    async retrieveFavoriteTeamNames(@Param() params): Promise<string[]> {
+        return await this.teamService.retrieveFavoriteTeamNames(params.username);
     }
 
     @Post('addFavoriteTeamForUser')

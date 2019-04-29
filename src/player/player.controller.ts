@@ -13,7 +13,7 @@ export class PlayerController {
     constructor(private readonly playerService: PlayerService) {}
 
     @Get('retrieveAllPlayersGivenChar/:lastNameChar')
-    async retrieveAllTeamsGivenChar(@Param() params): Promise<Player[]> {
+    async retrieveAllPlayersGivenChar(@Param() params): Promise<Player[]> {
         return await this.playerService.retrieveAllPlayersGivenChar(params.lastNameChar);
     }
 
@@ -33,8 +33,13 @@ export class PlayerController {
     }
 
     @Get('retrieveFavoritePlayers/:username')
-    async retrieveFavorteTeamsForUser(@Param() params): Promise<string[]> {
+    async retrieveFavoritePlayersForUser(@Param() params): Promise<string[]> {
         return await this.playerService.retrieveFavoritePlayersForUser(params.username);
+    }
+
+    @Get('retrieveFavoritePlayerNames/:username')
+    async retrieveFavoritePlayerNames(@Param() params): Promise<string[]> {
+        return await this.playerService.retrieveFavoritePlayerNames(params.username);
     }
 
     @Get('mapPlayerIdToName/:playerID')
@@ -43,12 +48,12 @@ export class PlayerController {
     }
 
     @Post('addFavoritePlayerForUser')
-    async addFavoriteTeamForUser(@Body() userFavPlayer: UserFavoritePlayerDTO): Promise<boolean> {
+    async addFavoritePlayerForUser(@Body() userFavPlayer: UserFavoritePlayerDTO): Promise<boolean> {
         return await this.playerService.addFavoritePlayerForUser(userFavPlayer);
     }
 
     @Post('deleteFavoritePlayerForUser')
-    async deleteFavoriteTeamForuser(@Body() userFavPlayer: UserFavoritePlayerDTO): Promise<boolean> {
+    async deleteFavoritePlayerForuser(@Body() userFavPlayer: UserFavoritePlayerDTO): Promise<boolean> {
         return await this.playerService.deleteFavoritePlayerForUser(userFavPlayer);
     }
 }

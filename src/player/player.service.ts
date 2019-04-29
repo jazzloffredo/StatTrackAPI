@@ -217,6 +217,35 @@ export class PlayerService {
         return playerIDs;
     }
 
+    async retrieveFavoritePlayerNames(username: string): Promise<string[]> {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        const favoriteNames: string[] = [];
+
+        try {
+            await pool.connect();
+
+            const result = await pool.request()
+                .input('Username', username)
+                .execute('Users.RetrievePlayerFavNames');
+
+            const resultAsTable = result.recordset.toTable();
+
+            for (const curRow of resultAsTable.rows) {
+                favoriteNames.push(curRow[0]);
+            }
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+
+        return favoriteNames;
+    }
+
     async mapPlayerIdToName(playerID: string): Promise<string[]> {
         const pool = new ConnectionPool(this.configService.dbConfig);
 

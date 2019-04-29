@@ -94,7 +94,7 @@ export class TeamService {
         return teamSeasons;
     }
 
-    async retrieveFavorteTimesForUser(username: string): Promise<string[]> {
+    async retrieveFavoriteTeamsForUser(username: string): Promise<string[]> {
 
         const pool = new ConnectionPool(this.configService.dbConfig);
 
@@ -121,6 +121,35 @@ export class TeamService {
         }
 
         return teamIDs;
+    }
+
+    async retrieveFavoriteTeamNames(username: string): Promise<string[]> {
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        const favoriteNames: string[] = [];
+
+        try {
+            await pool.connect();
+
+            const result = await pool.request()
+                .input('Username', username)
+                .execute('Users.RetrieveFavTeamNames');
+
+            const resultsAsTable = result.recordset.toTable();
+
+            for (const row of resultsAsTable.rows) {
+                favoriteNames.push(row[0]);
+            }
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+
+        return favoriteNames;
+
     }
 
     async addFavoriteTeamForUser(userFavTeam: UserFavoriteTeam): Promise<boolean> {
