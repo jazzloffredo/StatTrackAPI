@@ -21,7 +21,13 @@ export class TwitterService {
             access_token_secret: res.access_token_secret,
         });
 
-        const twitRes = await client.get('search/tweets', {q: name, count: 3});
+        const nameArray = name.split('+');
+        let fixedName = '';
+        for (const piece of nameArray) {
+            fixedName += piece;
+        }
+
+        const twitRes = await client.get('search/tweets', {q: fixedName, count: 3});
 
         for (const status of twitRes.statuses) {
             tweets.push({
@@ -33,7 +39,6 @@ export class TwitterService {
             });
         }
 
-        Logger.log(tweets);
         return tweets;
     }
 }

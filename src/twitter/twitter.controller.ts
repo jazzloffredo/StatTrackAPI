@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { TwitterService } from './twitter.service';
 import { Tweet } from '../twitter/interfaces/tweet.interface';
@@ -8,8 +8,8 @@ export class TwitterController {
 
     constructor(private readonly twitterService: TwitterService) { }
 
-    @Get('test')
-    async retrieveTweetsForName(name: string): Promise<Tweet[]> {
-        return this.twitterService.retrieveTweetsForName(name);
+    @Get('retrieveTweetsForName/:name')
+    async retrieveTweetsForName(@Param() params): Promise<Tweet[]> {
+        return this.twitterService.retrieveTweetsForName(params.name);
     }
 }
