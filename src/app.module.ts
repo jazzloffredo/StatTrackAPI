@@ -9,7 +9,6 @@ import { TeamService } from './team/team.service';
 import { PlayerService } from './player/player.service';
 import { PlayerController } from './player/player.controller';
 
-
 @Module({
   imports: [ConfigurationModule],
   controllers: [AppController, AuthController, TeamController, PlayerController],

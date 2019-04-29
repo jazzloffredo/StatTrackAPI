@@ -122,6 +122,61 @@ export class AuthService {
             }
         }
 
+        if (passwordMatchesHash) {
+            this.updateLastLogin(loginUser.username);
+        }
+
         return passwordMatchesHash;
+    }
+
+    async updateLastLogin(username: string) {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        try {
+            await pool.connect();
+
+            const response = await pool.request()
+                                    .input('Username', username)
+                                    .execute('Users.UpdateLastLogin');
+
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+    }
+
+    async updatePassword(loginUser: LoginUser): Promise<boolean> {
+
+        const pool = new ConnectionPool(this.configService.dbConfig);
+
+        let updateSuccess = false;
+
+        const hashedPassword = await hash(loginUser.password, 10);
+
+        try {
+            await pool.connect();
+
+            const response = await pool.request()
+                                    .input('Username', NVarChar, loginUser.username)
+                                    .input('PasswordHash', NVarChar, hashedPassword)
+                                    .execute('Users.UpdatePassword');
+
+            if (response.rowsAffected[0] === 1) {
+                updateSuccess = true;
+            }
+
+        } catch (err) {
+            Logger.log(err);
+        } finally {
+            if (pool.connected) {
+                pool.close();
+            }
+        }
+
+        return updateSuccess;
     }
 }
