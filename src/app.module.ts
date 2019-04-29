@@ -9,7 +9,7 @@ import { TeamService } from './team/team.service';
 import { PlayerService } from './player/player.service';
 import { PlayerController } from './player/player.controller';
 import { LeaderboardController } from './leaderboard/leaderboard.controller';
-import { LeaderboardService } from 'dist/leaderboard/leaderboard.service';
+import { LeaderboardService } from './leaderboard/leaderboard.service';
 
 @Module({
   imports: [ConfigurationModule],
