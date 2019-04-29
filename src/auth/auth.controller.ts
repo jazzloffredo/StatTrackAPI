@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { UsernameExistsException } from '../exceptions/username-exists.exception';
 import { EmailExistsException } from '../exceptions/email-exists.exception';
 import { LoginFailedException } from '../exceptions/login-failed.exception';
-import { UpdatePassFailedException } from 'src/exceptions/update-pass-failed.exception';
+import { UpdatePassFailedException } from '../exceptions/update-pass-failed.exception';
 
 @Controller('auth')
 export class AuthController {
