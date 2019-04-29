@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { UsernameExistsException } from '../exceptions/username-exists.exception';
 import { EmailExistsException } from '../exceptions/email-exists.exception';
 import { LoginFailedException } from '../exceptions/login-failed.exception';
+import { UpdatePassFailedException } from '../exceptions/update-pass-failed.exception';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +46,21 @@ export class AuthController {
         if (!loginSuccess) {
             throw new LoginFailedException();
         }
-        return;
+
+        return loginSuccess;
+    }
+
+    @Post('updatePassword')
+    @UsePipes(new ValidationPipe())
+    async updatePassword(@Body() loginUserDTO: LoginUserDTO): Promise<boolean> {
+        const validUsername = await this.authService.checkUsernameExists(loginUserDTO.username);
+
+        if (!validUsername) {
+            throw new UpdatePassFailedException();
+        }
+
+        const updateSuccess = await this.authService.updatePassword(loginUserDTO);
+
+        return updateSuccess;
     }
 }
