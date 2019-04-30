@@ -133,7 +133,7 @@ export class TeamService {
 
             const result = await pool.request()
                 .input('Username', username)
-                .execute('Users.RetrieveFavTeamNames');
+                .execute('Users.RetrieveTeamFavNames');
 
             const resultsAsTable = result.recordset.toTable();
 

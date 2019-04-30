@@ -21,7 +21,7 @@ export class TwitterService {
             access_token_secret: res.access_token_secret,
         });
 
-        const nameArray = name.split('+');
+        const nameArray = name.split('-');
         let fixedName = '';
         for (const piece of nameArray) {
             fixedName += piece;
